@@ -1,0 +1,7 @@
+services:
+  users-springboot:
+    build:
+      context: ./users-springboot
+    ports:
+      - 8080:8080
+
