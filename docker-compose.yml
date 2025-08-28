@@ -5,3 +5,10 @@ services:
     ports:
       - 8080:8080
 
+  frontend-react:
+    build:
+      context: ./frontend-react
+    ports:
+      - 3000:3000
+
+
