@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import LoginForm from './LoginForm.js';
 import Welcome from './Welcome.js';
-import Data from './Data.js';
+import DataSource from './DataSource.js';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -15,7 +15,7 @@ function App() {
   const loginForm = (<LoginForm onLogin={handleLogin} />);
   var loggedIn = (<div>
     <Welcome user={user} />
-    <Data />
+    <DataSource />
   </div>);
 
   return user === null ? loginForm : loggedIn;

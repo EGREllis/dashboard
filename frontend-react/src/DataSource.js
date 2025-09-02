@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Data() {
+function DataSource() {
     return (
         <div>
             <label for="dataSource">Data source: </label>
@@ -13,4 +13,4 @@ function Data() {
     );
 }
 
-export default Data;
+export default DataSource;
