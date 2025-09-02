@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import Currencies from './Currencies.js'
 
 function DataSource() {
     var dataTabs = [
@@ -36,7 +37,7 @@ function DataSource() {
                 </ul>
             </div>
             <div>
-                {currentTab}
+                {currentTab === "currency" ? <Currencies /> : currentTab}
             </div>
         </div>
     );
