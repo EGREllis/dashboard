@@ -1,19 +1,20 @@
 import React from 'react';
+import { useState } from 'react';
 
 function DataSource() {
-/*
-    <ul class="nav nav-tabs navbar-dark bg-dark align-items-center" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="jurisdiction-tab" data-bs-toggle="tab" data-bs-target="#jurisdiction-tab-pane" type="button" role="tab" aria-controls="jurisdiction-tab-pane" aria-selected="true">Jurisdiction</button>
-                            </li>
-                            */
-    var manualDataTabs = [
+    var dataTabs = [
         {id: "bonds", name: "Bonds"},
         {id: "currency", name: "Currency"},
         {id: "counterparty", name: "Counterparty"},
         {id: "discountCurves", name: "Discount curves"},
         {id: "creditRating", name: "Credit Rating"}
     ];
+
+    var [currentTab, setCurrentTab] = useState(dataTabs[0].id);
+
+    function closureChangeTab(id) {
+        return function () {setCurrentTab(id)};
+    }
 
     return (
         <div>
@@ -27,12 +28,15 @@ function DataSource() {
             </div>
             <div>
                 <ul class="nav nav-tabs navbar-light bg-light align-items-center" id="dataTab" role="tablist">
-                    {manualDataTabs.map((ele, index) =>
+                    {dataTabs.map((ele, index) =>
                         React.createElement("li", {key: index, className: "nav-item", role: "presentation"},
-                            React.createElement("button", {className: "nav-link"}, ele.name)
+                            React.createElement("button", {className: "nav-link", id: ele.id, onClick: closureChangeTab(ele.id)}, ele.name)
                         )
                     )}
                 </ul>
+            </div>
+            <div>
+                {currentTab}
             </div>
         </div>
     );
