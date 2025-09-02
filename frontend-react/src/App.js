@@ -1,25 +1,23 @@
-import logo from './logo.svg';
+import { useState } from 'react';
 import './App.css';
+import LoginForm from './LoginForm.js';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [userFirstName, setUserFirstName] = useState('');
+  const [userLastName, setUserLastName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+
+  function handleLogin(firstName, lastName, email) {
+    alert("App received: "+firstName+" "+lastName+" "+email);
+    setUserFirstName(firstName);
+    setUserLastName(lastName);
+    setUserEmail(email);
+  }
+
+  const loginForm = (<LoginForm onLogin={handleLogin} />);
+  var loggedIn = (<p>Welcome {userFirstName}</p>);
+
+  return userFirstName === '' ? loginForm : loggedIn;
 }
 
 export default App;
