@@ -6,7 +6,6 @@ function LoginForm({onLogin}) {
     var firstName = document.getElementById('firstName').value;
     var lastName = document.getElementById('lastName').value;
     var email = document.getElementById('email').value;
-    alert("Submitted: "+firstName +" "+lastName+ " "+email);
     onLogin(firstName, lastName, email);
   }
 
