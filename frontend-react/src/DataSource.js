@@ -4,11 +4,10 @@ import Currencies from './Currencies.js'
 
 function DataSource() {
     var dataTabs = [
-        {id: "bonds", name: "Bonds"},
         {id: "currency", name: "Currency"},
         {id: "counterparty", name: "Counterparty"},
         {id: "discountCurves", name: "Discount curves"},
-        {id: "creditRating", name: "Credit Rating"}
+        {id: "bonds", name: "Bonds"}
     ];
 
     var [currentTab, setCurrentTab] = useState(dataTabs[0].id);
