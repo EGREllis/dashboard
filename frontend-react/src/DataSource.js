@@ -1,12 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
-import Currencies from './Currencies.js'
+import ListTable from './ListTable.js';
 
 function DataSource() {
     var dataTabs = [
-        {id: "currency", name: "Currency"},
-        {id: "counterparty", name: "Counterparty"},
+        {id: "currencies", name: "Currencies"},
         {id: "discountCurves", name: "Discount curves"},
+        {id: "counterparties", name: "Counterparties"},
         {id: "bonds", name: "Bonds"}
     ];
 
@@ -14,6 +14,79 @@ function DataSource() {
 
     function closureChangeTab(id) {
         return function () {setCurrentTab(id)};
+    }
+
+    var [data, setData] = useState({
+                            currencies: [{id: "gbp", name: "GBP"}],
+                            counterparties: [{id: "rbs.g", ticker: "RBS.G", name: "Royal Bank of Scotland", currency: "gbp"}],
+                            discountCurves: [{id: "gbp", values:[1, 0.9, 0.8, 0.7, 0.6, 0.5]}],
+                            bonds: [{id: "rbs_5yr", counterparty: "rbs.g", principle: 1000000, coupon: 0.05, maturity: 5}],
+                            cashFlows: []
+                          });
+
+    var callbacks = {
+        getCurrencies: function() {
+            return data.currencies;
+        },
+        addCurrency: function(newCurrency) {
+            var currencyAdded = data.currencies;
+            currencyAdded.push(newCurrency);
+            setData({
+                currencies: currencyAdded,
+                counterparty: data.counterparty,
+                discountCurves: data.discountCurves,
+                bonds: data.bonds,
+                cashFlows: []
+            });
+        },
+        removeCurrency: function(currencyIndex) {
+            var currencyRemoved = [];
+            if (currencyIndex === 0) {
+                currencyRemoved = data.currencies.slice(1, data.currencies.length);
+            } else {
+                currencyRemoved = data.currencies.slice(0, currencyIndex).concat(data.currencies.slice(currencyIndex+1, data.currencies.length))
+            }
+            setData({
+                currencies: currencyRemoved,
+                counterparty: data.counterparty,
+                discountCurves: data.discountCurves,
+                bonds: data.bonds,
+                cashFlows: data.cashFlows
+            });
+        }
+    };
+
+    var tabJsx = null;
+    if (currentTab === "currencies") {
+        tabJsx = (<ListTable
+            idPrefix="currenciesTable"
+            headers={[{"id": "name", "name": "Symbol"}]}
+            data={data.currencies} />);
+    } else if (currentTab === "discountCurves") {
+        tabJsx = currentTab;
+    } else if (currentTab === "counterparties") {
+        tabJsx = (<ListTable
+                    idPrefix="counterpartiesTable"
+                    headers={[
+                        {"id": "ticker", "name": "Ticker"},
+                        {"id": "name", "name": "Name"},
+                        {"id": "currency", "name": "Currency"}
+                    ]}
+                    data={data.counterparties}
+                />);
+    } else if (currentTab === "bonds") {
+        tabJsx = (<ListTable
+                    idPrefix="bondsTable"
+                    headers={[
+                        {"id": "counterparty", "name": "Counterparty"},
+                        {"id": "principle", "name": "Principle"},
+                        {"id": "coupon", "name": "Coupon"},
+                        {"id": "maturity", "name": "Maturity"}
+                    ]}
+                    data={data.bonds}
+                />);
+    } else {
+        tabJsx = currentTab;
     }
 
     return (
@@ -29,14 +102,15 @@ function DataSource() {
             <div>
                 <ul class="nav nav-tabs navbar-light bg-light align-items-center" id="dataTab" role="tablist">
                     {dataTabs.map((ele, index) =>
-                        React.createElement("li", {key: index, className: "nav-item", role: "presentation"},
-                            React.createElement("button", {className: "nav-link", id: ele.id, onClick: closureChangeTab(ele.id)}, ele.name)
+                        React.createElement("li", {key: "dataSource_list_item_"+index, className: "nav-item", role: "presentation"},
+                            React.createElement("button", {key: "dataSource_button_"+index, className: "nav-link", id: ele.id, onClick: closureChangeTab(ele.id)}, ele.name)
                         )
                     )}
                 </ul>
             </div>
             <div>
-                {currentTab === "currency" ? <Currencies /> : currentTab}
+                <p>{currentTab}</p>
+                {tabJsx}
             </div>
         </div>
     );
