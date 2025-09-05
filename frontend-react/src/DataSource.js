@@ -61,7 +61,13 @@ function DataSource() {
         tabJsx = (<ListTable
             idPrefix="currenciesTable"
             headers={[{"id": "name", "name": "Symbol"}]}
-            data={data.currencies} />);
+            data={data.currencies}
+            createInputs={[
+                function(idPrefix, colIndex) {
+                    return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Currency"}, null);
+                }
+            ]}
+            />);
     } else if (currentTab === "discountCurves") {
         tabJsx = currentTab;
     } else if (currentTab === "counterparties") {
@@ -73,6 +79,22 @@ function DataSource() {
                         {"id": "currency", "name": "Currency"}
                     ]}
                     data={data.counterparties}
+                    createInputs={[
+                        function(idPrefix, colIndex) {
+                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Ticker"}, null);
+                        },
+                        function(idPrefix, colIndex) {
+                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Name"}, null);
+                        },
+                        function(idPrefix, colIndex) {
+                            var values = [];
+                            for (var offset = 0; offset < data.currencies.length; offset++) {
+                                var currency = data.currencies[offset];
+                                values.push(React.createElement("option", {key: idPrefix+"_input_cell_"+colIndex+"_option_value_"+offset, value: currency.id}, currency.name));
+                            }
+                            return React.createElement("select", {key: idPrefix+"_input_cell_"+colIndex+"_option"}, values);
+                        }
+                    ]}
                 />);
     } else if (currentTab === "bonds") {
         tabJsx = (<ListTable
@@ -84,6 +106,25 @@ function DataSource() {
                         {"id": "maturity", "name": "Maturity"}
                     ]}
                     data={data.bonds}
+                    createInputs={[
+                        function(idPrefix, colIndex) {
+                            var partyValues = [];
+                            for (var partyIndex = 0; partyIndex < data.counterparties; partyIndex++) {
+                                var party = data.counterparties[partyIndex];
+                                partyValues.push(React.createElement("option", {key: idPrefix+"_input_cell_"+colIndex+"_option_value_"+partyIndex, value: party.id}, party.name));
+                            }
+                            return React.createElement("select", {key: idPrefix+"_input_cell_"+colIndex, placeholder: "Counterparty"}, partyValues);
+                        },
+                        function(idPrefix, colIndex) {
+                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Principle"}, null);
+                        },
+                        function(idPrefix, colIndex) {
+                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Coupon"}, null);
+                        },
+                        function(idPrefix, colIndex) {
+                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Maturity"}, null);
+                        }
+                    ]}
                 />);
     } else {
         tabJsx = currentTab;
