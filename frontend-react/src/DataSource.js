@@ -109,7 +109,7 @@ function DataSource() {
                     createInputs={[
                         function(idPrefix, colIndex) {
                             var partyValues = [];
-                            for (var partyIndex = 0; partyIndex < data.counterparties; partyIndex++) {
+                            for (var partyIndex = 0; partyIndex < data.counterparties.length; partyIndex++) {
                                 var party = data.counterparties[partyIndex];
                                 partyValues.push(React.createElement("option", {key: idPrefix+"_input_cell_"+colIndex+"_option_value_"+partyIndex, value: party.id}, party.name));
                             }
