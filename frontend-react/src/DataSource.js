@@ -64,9 +64,22 @@ function DataSource() {
             data={data.currencies}
             createInputs={[
                 function(idPrefix, colIndex) {
-                    return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Currency"}, null);
+                    var id = idPrefix+"_input_cell_"+colIndex;
+                    return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Currency"}, null);
                 }
             ]}
+            addElementButton={function(idPrefix) {
+                var buttonId = idPrefix+"_add_button";
+                var id = idPrefix+"_input_cell_"+0;
+                function addButtonClicked(idPrefix) {
+                    return function() {
+                        var ele = document.getElementById(id);
+                        var newCurrency = {id: ele.value.toLowerCase(), name: ele.value.toUpperCase()};
+                        callbacks.addCurrency(newCurrency);
+                    }
+                }
+                return React.createElement("button", {key: buttonId, id: buttonId, onClick: addButtonClicked(idPrefix)}, "+");
+            }}
             />);
     } else if (currentTab === "discountCurves") {
         tabJsx = currentTab;

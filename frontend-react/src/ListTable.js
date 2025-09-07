@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ListTable({idPrefix, headers, data, createInputs}) {
+function ListTable({idPrefix, headers, data, createInputs, addElementButton}) {
     var tableHeader = [];
     var tableBody = [];
     var tableInputs = [];
@@ -23,6 +23,7 @@ function ListTable({idPrefix, headers, data, createInputs}) {
     for (var colIndex = 0; colIndex < headers.length; colIndex++) {
         tableInputs[colIndex] = React.createElement("td", {key: idPrefix+"_input_row_table_cell_"+colIndex}, createInputs[colIndex](idPrefix, colIndex));
     }
+    tableInputs.push(addElementButton(idPrefix));
     var inputsJsx = React.createElement("tr", {key: idPrefix+"_input_row"}, tableInputs);
 
     return (
