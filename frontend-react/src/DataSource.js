@@ -155,7 +155,7 @@ function DataSource() {
                                 id: tickerValue.toLowerCase(),
                                 ticker: tickerValue.toUpperCase(),
                                 name: nameValue,
-                                currency: currencyValue
+                                currency: currencyValue.toLowerCase()
                             };
 
                             callbacks.addCounterparty(newCounterparty);
