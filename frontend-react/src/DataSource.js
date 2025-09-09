@@ -25,18 +25,15 @@ function DataSource() {
                           });
 
     var callbacks = {
-        getCurrencies: function() {
-            return data.currencies;
-        },
         addCurrency: function(newCurrency) {
             var currencyAdded = data.currencies;
             currencyAdded.push(newCurrency);
             setData({
                 currencies: currencyAdded,
-                counterparty: data.counterparty,
+                counterparties: data.counterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
-                cashFlows: []
+                cashFlows: data.cashFlows
             });
         },
         removeCurrency: function(currencyIndex) {
@@ -48,7 +45,37 @@ function DataSource() {
             }
             setData({
                 currencies: currencyRemoved,
-                counterparty: data.counterparty,
+                counterparties: data.counterparties,
+                discountCurves: data.discountCurves,
+                bonds: data.bonds,
+                cashFlows: data.cashFlows
+            });
+        },
+        addCounterparty(newCounterparty) {
+            var newCounterparties = data.counterparties.concat([newCounterparty]);
+            setData({
+                currencies: data.currencies,
+                counterparties: newCounterparties,
+                discountCurves: data.discountCurves,
+                bonds: data.bonds,
+                cashFlows: data.cashFlows
+            });
+        },
+        removeCounterparty(counterpartyIndex) {
+            var newCounterparties = [];
+            if (counterpartyIndex <= 0) {
+                newCounterparties = data.counterparties.slice(1, data.counterparties.length);
+            } else if (counterpartyIndex === (counterpartyIndex.length-1)) {
+                newCounterparties = data.counterparties.slice(0, data.counterparties.length -2);
+            } else {
+                newCounterparties = newCounterparties.concat(
+                    data.counterparties.slice(0, counterpartyIndex),
+                    data.counterparties.slice(counterpartyIndex, data.counterparties.length)
+                );
+            }
+            setData({
+                currencies: data.currencies,
+                counterparties: newCounterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
                 cashFlows: data.cashFlows
@@ -94,20 +121,52 @@ function DataSource() {
                     data={data.counterparties}
                     createInputs={[
                         function(idPrefix, colIndex) {
-                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Ticker"}, null);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Ticker"}, null);
                         },
                         function(idPrefix, colIndex) {
-                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Name"}, null);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Name"}, null);
                         },
                         function(idPrefix, colIndex) {
                             var values = [];
                             for (var offset = 0; offset < data.currencies.length; offset++) {
                                 var currency = data.currencies[offset];
-                                values.push(React.createElement("option", {key: idPrefix+"_input_cell_"+colIndex+"_option_value_"+offset, value: currency.id}, currency.name));
+                                var optionId = idPrefix+"_input_cell_"+colIndex+"_option_value"+offset;
+                                values.push(React.createElement("option", {key: optionId, id: optionId, value: currency.id}, currency.name));
                             }
-                            return React.createElement("select", {key: idPrefix+"_input_cell_"+colIndex+"_option"}, values);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("select", {key: id, id: id}, values);
                         }
                     ]}
+                    addElementButton={function(idPrefix) {
+                        var tickerId = idPrefix+"_input_cell_"+0;
+                        var nameId = idPrefix+"_input_cell_"+1;
+                        var currencyId = idPrefix+"_input_cell_"+2;
+                        var buttonId = idPrefix+"_add_button";
+
+                        function addCounterpartyButtonClicked(idPrefix) {
+                            var tickerValue = document.getElementById(tickerId).value;
+                            var nameValue = document.getElementById(nameId).value;
+                            var currencySelectEle = document.getElementById(currencyId);
+                            var currencyValue = currencySelectEle.options[currencySelectEle.selectedIndex].text;
+
+                            var newCounterparty = {
+                                id: tickerValue.toLowerCase(),
+                                ticker: tickerValue.toUpperCase(),
+                                name: nameValue,
+                                currency: currencyValue
+                            };
+
+                            callbacks.addCounterparty(newCounterparty);
+                        }
+
+                        function addCounterpartyButtonClickedClosure(idPrefix) {
+                            return function() {addCounterpartyButtonClicked(idPrefix)};
+                        }
+
+                        return React.createElement("button", {key: buttonId, id: buttonId, onClick: addCounterpartyButtonClickedClosure(idPrefix)}, "+");
+                    }}
                 />);
     } else if (currentTab === "bonds") {
         tabJsx = (<ListTable
