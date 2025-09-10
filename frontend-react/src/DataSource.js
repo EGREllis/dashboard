@@ -66,7 +66,7 @@ function DataSource() {
             if (counterpartyIndex <= 0) {
                 newCounterparties = data.counterparties.slice(1, data.counterparties.length);
             } else if (counterpartyIndex === (counterpartyIndex.length-1)) {
-                newCounterparties = data.counterparties.slice(0, data.counterparties.length -2);
+                newCounterparties = data.counterparties.slice(0, data.counterparties.length -1);
             } else {
                 newCounterparties = newCounterparties.concat(
                     data.counterparties.slice(0, counterpartyIndex),
@@ -78,6 +78,38 @@ function DataSource() {
                 counterparties: newCounterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
+                cashFlows: data.cashFlows
+            });
+        },
+        addBond(newBond) {
+            alert("Adding Bond "+newBond);
+            var newBonds = data.bonds.concat(newBond);
+            alert("New Bonds: "+newBonds+": instanceof Array = "+(newBonds instanceof Array));
+            setData({
+                currencies: data.currencies,
+                counterparties: data.counterparties,
+                discountCurves: data.discountCurves,
+                bonds: newBonds,
+                cashFlows: data.cashFlows
+            });
+        },
+        removeBond(bondIndex) {
+            var newBonds = [];
+            if (bondIndex <= 0) {
+                newBonds.concat(data.bonds.slice(1, data.bonds.length));
+            } else if (bondIndex === (data.bonds.length-1)) {
+                newBonds.concat(data.bonds.slice(0, data.bonds.length-1));
+            } else {
+                newBonds = [].concat(
+                    data.bonds.slice(0, bondIndex-1),
+                    data.bonds.slice(bondIndex+1, data.bonds.length)
+                );
+            }
+            setData({
+                currencies: data.currencies,
+                counterparties: data.counterparties,
+                discountCurves: data.discountCurves,
+                bonds: newBonds,
                 cashFlows: data.cashFlows
             });
         }
@@ -182,21 +214,52 @@ function DataSource() {
                         function(idPrefix, colIndex) {
                             var partyValues = [];
                             for (var partyIndex = 0; partyIndex < data.counterparties.length; partyIndex++) {
+                                var valueId = idPrefix+"_input_cell_"+colIndex+"_option_value_"+partyIndex;
                                 var party = data.counterparties[partyIndex];
-                                partyValues.push(React.createElement("option", {key: idPrefix+"_input_cell_"+colIndex+"_option_value_"+partyIndex, value: party.id}, party.name));
+                                partyValues.push(React.createElement("option", {key: valueId, id: valueId, value: party.id}, party.name));
                             }
-                            return React.createElement("select", {key: idPrefix+"_input_cell_"+colIndex, placeholder: "Counterparty"}, partyValues);
+                            var selectId = idPrefix+"_input_cell_"+colIndex+"_select";
+                            return React.createElement("select", {key: selectId, id: selectId}, partyValues);
                         },
                         function(idPrefix, colIndex) {
-                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Principle"}, null);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Principle"}, null);
                         },
                         function(idPrefix, colIndex) {
-                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Coupon"}, null);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Coupon"}, null);
                         },
                         function(idPrefix, colIndex) {
-                            return React.createElement("input", {key: idPrefix+"_input_cell_"+colIndex, type: "text", placeholder: "Maturity"}, null);
+                            var id = idPrefix+"_input_cell_"+colIndex;
+                            return React.createElement("input", {key: id, id: id, type: "text", placeholder: "Maturity"}, null);
                         }
                     ]}
+                    addElementButton={function(idPrefix) {
+                        var buttonId = idPrefix+"_add_button";
+                        var counterpartyId = idPrefix+"_input_cell_"+0+"_select";
+                        var principleId = idPrefix+"_input_cell_"+1;
+                        var couponId = idPrefix+"_input_cell_"+2;
+                        var maturityId = idPrefix+"_input_cell_"+3;
+
+                        function addBondButtonClicked(idPrefix) {
+                            var counterpartySelectEle = document.getElementById(counterpartyId);
+                            var counterpartyValue = counterpartySelectEle.options[counterpartySelectEle.selectedIndex].value;
+                            var principleValue = document.getElementById(principleId).value;
+                            var couponValue = document.getElementById(couponId).value;
+                            var maturityValue = document.getElementById(maturityId).value;
+                            var bondId = counterpartyValue+"_"+maturityValue+"yr";
+
+                            var newBond = {id: bondId, counterparty: counterpartyValue, principle: principleValue, coupon: couponValue, maturity: maturityValue};
+
+                            callbacks.addBond(newBond);
+                        }
+
+                        function addBondButtonClickedClosure(idPrefix) {
+                            return function() {addBondButtonClicked(idPrefix)};
+                        }
+
+                        return React.createElement("button", {key: buttonId, id: buttonId, onClick: addBondButtonClickedClosure(idPrefix)}, "+");
+                    }}
                 />);
     } else {
         tabJsx = currentTab;

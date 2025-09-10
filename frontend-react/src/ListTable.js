@@ -23,7 +23,7 @@ function ListTable({idPrefix, headers, data, createInputs, addElementButton}) {
     for (var colIndex = 0; colIndex < headers.length; colIndex++) {
         tableInputs[colIndex] = React.createElement("td", {key: idPrefix+"_input_row_table_cell_"+colIndex}, createInputs[colIndex](idPrefix, colIndex));
     }
-    tableInputs.push(addElementButton(idPrefix));
+    tableInputs.push(React.createElement("td", {key: idPrefix+"input_row_table_cell_"+headers.length}, addElementButton(idPrefix)));
     var inputsJsx = React.createElement("tr", {key: idPrefix+"_input_row"}, tableInputs);
 
     return (
