@@ -7,7 +7,10 @@ function DataSource() {
         {id: "currencies", name: "Currencies"},
         {id: "discountCurves", name: "Discount curves"},
         {id: "counterparties", name: "Counterparties"},
-        {id: "bonds", name: "Bonds"}
+        {id: "bonds", name: "Bonds"},
+        {id: "cashFlows", name: "Cash flows"},
+        {id: "discountedCashFlows", name: "Discounted cash flows"},
+        {id: "netPresentValue", name: "Net present value"}
     ];
 
     var [currentTab, setCurrentTab] = useState(dataTabs[0].id);
@@ -17,11 +20,14 @@ function DataSource() {
     }
 
     var [data, setData] = useState({
+                            tenors: [{id: 0, name: "0Y"}, {id: 1, name: "1Y"}, {id: 2, name: "2Y"}, {id: 3, name: "3Y"}, {id: 4, name: "4Y"}, {id: 5, name: "5Y"}],
                             currencies: [{id: "gbp", name: "GBP"}],
                             counterparties: [{id: "rbs.g", ticker: "RBS.G", name: "Royal Bank of Scotland", currency: "gbp"}],
                             discountCurves: [{id: "gbp", values:[1, 0.9, 0.8, 0.7, 0.6, 0.5]}],
                             bonds: [{id: "rbs_5yr", counterparty: "rbs.g", principle: 1000000, coupon: 0.05, maturity: 5}],
-                            cashFlows: []
+                            cashFlows: [],
+                            discountCashFlows: [],
+                            netPresentValue: []
                           });
 
     var callbacks = {
@@ -29,11 +35,14 @@ function DataSource() {
             var currencyAdded = data.currencies;
             currencyAdded.push(newCurrency);
             setData({
+                tenors: data.tenors,
                 currencies: currencyAdded,
                 counterparties: data.counterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         },
         removeCurrency: function(currencyIndex) {
@@ -46,53 +55,64 @@ function DataSource() {
                 currencyRemoved = data.currencies.slice(0, currencyIndex).concat(data.currencies.slice(currencyIndex+1, data.currencies.length))
             }
             setData({
+                tenors: data.tenors,
                 currencies: currencyRemoved,
                 counterparties: data.counterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         },
         addCounterparty(newCounterparty) {
             var newCounterparties = data.counterparties.concat([newCounterparty]);
             setData({
+                tenors: data.tenors,
                 currencies: data.currencies,
                 counterparties: newCounterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         },
         removeCounterparty(counterpartyIndex) {
             var newCounterparties = [];
             if (counterpartyIndex <= 0) {
                 newCounterparties = data.counterparties.slice(1, data.counterparties.length);
-            } else if (counterpartyIndex === (counterpartyIndex.length-1)) {
+            } else if (counterpartyIndex >= (counterpartyIndex.length-1)) {
                 newCounterparties = data.counterparties.slice(0, data.counterparties.length -1);
             } else {
                 newCounterparties = newCounterparties.concat(
                     data.counterparties.slice(0, counterpartyIndex),
-                    data.counterparties.slice(counterpartyIndex, data.counterparties.length)
+                    data.counterparties.slice(counterpartyIndex+1, data.counterparties.length)
                 );
             }
             setData({
+                tenors: data.tenors,
                 currencies: data.currencies,
                 counterparties: newCounterparties,
                 discountCurves: data.discountCurves,
                 bonds: data.bonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         },
         addBond(newBond) {
-            alert("Adding Bond "+newBond);
             var newBonds = data.bonds.concat(newBond);
-            alert("New Bonds: "+newBonds+": instanceof Array = "+(newBonds instanceof Array));
             setData({
+                tenors: data.tenors,
                 currencies: data.currencies,
                 counterparties: data.counterparties,
                 discountCurves: data.discountCurves,
                 bonds: newBonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         },
         removeBond(bondIndex) {
@@ -108,11 +128,14 @@ function DataSource() {
                 );
             }
             setData({
+                tenors: data.tenors,
                 currencies: data.currencies,
                 counterparties: data.counterparties,
                 discountCurves: data.discountCurves,
                 bonds: newBonds,
-                cashFlows: data.cashFlows
+                cashFlows: data.cashFlows,
+                discountCashFlows: data.discountCashFlows,
+                netPresentValue: data.netPresentValue
             });
         }
     };
@@ -137,6 +160,7 @@ function DataSource() {
                         var ele = document.getElementById(id);
                         var newCurrency = {id: ele.value.toLowerCase(), name: ele.value.toUpperCase()};
                         callbacks.addCurrency(newCurrency);
+                        ele.value="";
                     }
                 }
                 return React.createElement("button", {key: buttonId, id: buttonId, onClick: addButtonClicked(idPrefix)}, "+");
@@ -201,6 +225,8 @@ function DataSource() {
                                 currency: currencyValue.toLowerCase()
                             };
 
+                            document.getElementById(tickerId).value="";
+                            document.getElementById(nameId).value="";
                             callbacks.addCounterparty(newCounterparty);
                         }
 
@@ -270,6 +296,10 @@ function DataSource() {
                             var bondId = counterpartyValue+"_"+maturityValue+"yr";
 
                             var newBond = {id: bondId, counterparty: counterpartyValue, principle: principleValue, coupon: couponValue, maturity: maturityValue};
+
+                            document.getElementById(principleId).value = "";
+                            document.getElementById(couponId).value = "";
+                            document.getElementById(maturityId).value = "";
 
                             callbacks.addBond(newBond);
                         }
