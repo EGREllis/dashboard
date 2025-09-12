@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ListTable({idPrefix, headers, data, createInputs, addElementButton}) {
+function ListTable({idPrefix, headers, data, createInputs, addElementButton, removeElementButton}) {
     var tableHeader = [];
     var tableBody = [];
     var tableInputs = [];
@@ -9,6 +9,7 @@ function ListTable({idPrefix, headers, data, createInputs, addElementButton}) {
         var header = headers[i];
         tableHeader.push(React.createElement("th", {key: idPrefix+"_header_"+i}, header.name));
     }
+    tableHeader.push(React.createElement("th", {key: idPrefix+"_header_"+headers.length},"+/-"));
 
     for (var rowIndex = 0; rowIndex < data.length; rowIndex++) {
         var row = data[rowIndex];
@@ -17,6 +18,10 @@ function ListTable({idPrefix, headers, data, createInputs, addElementButton}) {
             var colId = headers[colIndex].id;
             cell.push(React.createElement("td", {key: idPrefix+"_data_row_"+rowIndex+"_col_"+colIndex+"_value"}, row[colId]));
         }
+        cell.push(React.createElement(
+            "td",
+            {key: idPrefix+"_data_row_"+rowIndex+"_col_"+headers.length+"_value"},
+            removeElementButton(idPrefix, rowIndex)));
         tableBody.push(React.createElement("tr", {key: idPrefix+"_data_row_"+rowIndex}, cell));
     }
 

@@ -40,6 +40,8 @@ function DataSource() {
             var currencyRemoved = [];
             if (currencyIndex === 0) {
                 currencyRemoved = data.currencies.slice(1, data.currencies.length);
+            } else if (currencyIndex >= (data.currencies.length-1)) {
+                currencyRemoved = data.currencies.slice(0, currencyIndex);
             } else {
                 currencyRemoved = data.currencies.slice(0, currencyIndex).concat(data.currencies.slice(currencyIndex+1, data.currencies.length))
             }
@@ -139,6 +141,15 @@ function DataSource() {
                 }
                 return React.createElement("button", {key: buttonId, id: buttonId, onClick: addButtonClicked(idPrefix)}, "+");
             }}
+            removeElementButton={function(idPrefix, rowIndex) {
+                var buttonId = idPrefix+"_remove_button_"+rowIndex;
+                function removeButtonClickedClosure(idPrefix, rowIndex) {
+                    return function() {
+                        callbacks.removeCurrency(rowIndex);
+                    };
+                }
+                return React.createElement("button", {key: buttonId, id: buttonId, onClick: removeButtonClickedClosure(idPrefix, rowIndex)}, "-");
+            }}
             />);
     } else if (currentTab === "discountCurves") {
         tabJsx = currentTab;
@@ -198,6 +209,15 @@ function DataSource() {
                         }
 
                         return React.createElement("button", {key: buttonId, id: buttonId, onClick: addCounterpartyButtonClickedClosure(idPrefix)}, "+");
+                    }}
+                    removeElementButton={function(idPrefix, rowIndex) {
+                                    var buttonId = idPrefix+"_remove_button_"+rowIndex;
+                                    function removeButtonClickedClosure(idPrefix, rowIndex) {
+                                        return function() {
+                                            callbacks.removeCounterparty(rowIndex);
+                                        };
+                                    }
+                                    return React.createElement("button", {key: buttonId, id: buttonId, onClick: removeButtonClickedClosure(idPrefix, rowIndex)}, "-");
                     }}
                 />);
     } else if (currentTab === "bonds") {
@@ -259,6 +279,15 @@ function DataSource() {
                         }
 
                         return React.createElement("button", {key: buttonId, id: buttonId, onClick: addBondButtonClickedClosure(idPrefix)}, "+");
+                    }}
+                    removeElementButton={function(idPrefix, rowIndex) {
+                                                        var buttonId = idPrefix+"_remove_button_"+rowIndex;
+                                                        function removeButtonClickedClosure(idPrefix, rowIndex) {
+                                                            return function() {
+                                                                callbacks.removeBond(rowIndex);
+                                                            };
+                                                        }
+                                                        return React.createElement("button", {key: buttonId, id: buttonId, onClick: removeButtonClickedClosure(idPrefix, rowIndex)}, "-");
                     }}
                 />);
     } else {
